@@ -1,8 +1,8 @@
-use std::{error::Error, io::BufRead};
+use std::{fs::File, error::Error, io::{BufRead, BufReader}};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let file = std::fs::File::open("./resources/input.txt")?;
-    let reader = std::io::BufReader::new(file);
+    let file = File::open("./resources/input.txt")?;
+    let reader = BufReader::new(file);
 
     let mut max = -1;
     let mut current = 0;
