@@ -33,12 +33,12 @@ fn main()  -> Result<(), Box<dyn Error>>  {
                 }
 
                 if last == '.' {
-                    row.push(Blob::create(idx, character.to_string(), character.is_numeric()));
+                    row.push(Blob::create(idx, character.to_string(), numeric));
                 } else {
-                    if character.is_numeric() && last.is_numeric() {
+                    if numeric && last.is_numeric() {
                         row.last_mut().unwrap().content.push(character);
                     } else {
-                        row.push(Blob::create(idx, character.to_string(), character.is_numeric()));
+                        row.push(Blob::create(idx, character.to_string(), numeric));
                     }
                 }
             }
@@ -49,39 +49,25 @@ fn main()  -> Result<(), Box<dyn Error>>  {
 
     let mut sum: i32 = 0;
     for (row_id, row) in table.iter().enumerate() {
-        'cell_loop: for (column_id, cell) in row.iter().enumerate() {
+        for (column_id, cell) in row.iter().enumerate() {
             if cell.numeric {
                 continue;
             }
 
-            let mut gears = vec![];
-
+            let mut blobs_to_check = vec![];
             // left
             if column_id != 0 {
-                let left = row.get(column_id - 1).unwrap();
-                if left.start + left.content.len() == cell.start {
-                    gears.push(left);
-                }
+                blobs_to_check.push(row.get(column_id - 1).unwrap())
             }
             // right
             if column_id != row.len() - 1 {
-                let right = row.get(column_id + 1).unwrap();
-                if right.start == cell.start + 1 {
-                    gears.push(right);
-                }
+                blobs_to_check.push(row.get(column_id + 1).unwrap());
             }
             // top
             if row_id != 0 {
-                let top = table.get(row_id -1).unwrap();
+                let top = table.get(row_id - 1).unwrap();
                 for top_cell in top {
-                    if !top_cell.numeric {
-                        continue;
-                    }
-                    let top_cell_right = top_cell.start + top_cell.content.len();
-
-                    if top_cell.start <= cell.start + 1 && top_cell_right >= cell.start {
-                        gears.push(top_cell);
-                    }
+                    blobs_to_check.push(top_cell);
                 }
             }
             
@@ -89,19 +75,19 @@ fn main()  -> Result<(), Box<dyn Error>>  {
             if row_id != table.len() - 1 {
                 let bottom = table.get(row_id + 1).unwrap();
                 for bottom_cell in bottom {
-                    if !bottom_cell.numeric {
-                        continue;
-                    }
-                    let bottom_cell_right = bottom_cell.start + bottom_cell.content.len();
+                    blobs_to_check.push(bottom_cell);
+                }
+            }
 
-                    if bottom_cell.start <= cell.start + 1 && bottom_cell_right >= cell.start {
-                        gears.push(bottom_cell);
-                    }
+            let mut gears = vec![];
+            for blob in blobs_to_check {
+                if check_cell(cell, blob) {
+                    gears.push(blob.content.parse::<i32>().unwrap());
                 }
             }
 
             if gears.len() == 2 {
-                sum += gears[0].content.parse::<i32>().unwrap() * gears[1].content.parse::<i32>().unwrap();
+                sum += gears[0] * gears[1];
             }
         }
     }
@@ -109,4 +95,17 @@ fn main()  -> Result<(), Box<dyn Error>>  {
     println!("The sum is: {sum}");
 
     return Ok(());
+}
+
+fn check_cell(blob: &Blob, other: &Blob) -> bool {
+    if !other.numeric {
+        return false;
+    }
+    let other_cell_right = other.start + other.content.len();
+
+    if other.start <= blob.start + 1 && other_cell_right >= blob.start {
+        return true;
+    }
+
+    return false;
 }
