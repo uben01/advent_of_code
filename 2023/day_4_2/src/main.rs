@@ -6,12 +6,9 @@ fn main()  -> Result<(), Box<dyn Error>>  {
     let file = File::open("resources/input.txt")?;
     let buff = BufReader::new(file);
 
-    let card_matcher = Regex::new(r"Card\s*\d+:(.*)").unwrap();
-    let winning_matcher = Regex::new(r"(.*)\|(.*)").unwrap();
     let number_matcher = Regex::new(r"(\d+)").unwrap();
 
     let mut won_card_ids: Vec<usize> = vec![];
-
     for (idx, line) in buff.lines().enumerate() {
         won_card_ids.push(idx);
 
@@ -20,12 +17,11 @@ fn main()  -> Result<(), Box<dyn Error>>  {
         let mut winning_numbers: Vec<i32> = vec![];
         let mut my_numbers: Vec<i32> = vec![];
 
-        let captures = card_matcher.captures(&line).unwrap();
-        let line = &captures[1];
+        let line = line.split(":").last().unwrap();
 
-        let captures = winning_matcher.captures(&line).unwrap();
-        let left_side = &captures[1];
-        let right_side = &captures[2];
+        let split_line: Vec<&str> = line.split('|').collect();
+        let left_side = split_line.get(0).unwrap();
+        let right_side = split_line.get(1).unwrap();
 
         for capture in number_matcher.captures_iter(&left_side) {
             winning_numbers.push(capture[1].parse().unwrap());
