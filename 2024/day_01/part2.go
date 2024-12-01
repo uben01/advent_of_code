@@ -35,9 +35,9 @@ func main() {
 	}
 
 	sum := 0
-	for _, left := range listLeft {
+	for _, left = range listLeft {
 		counter := 0
-		for _, right := range listRight {
+		for _, right = range listRight {
 			if left == right {
 				counter++
 			}

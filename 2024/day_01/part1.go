@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"math"
 	"os"
 	"sort"
@@ -16,17 +17,17 @@ func main() {
 	}
 	defer file.Close()
 
-	listLeft := []int{}
-	listRight := []int{}
-	var left int
-	var right int
+	listLeft := []float64{}
+	listRight := []float64{}
+	var left float64
+	var right float64
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		split := strings.Split(line, "   ")
-		left, err = strconv.Atoi(split[0])
-		right, err = strconv.Atoi(split[1])
+		left, err = strconv.ParseFloat(split[0], 64)
+		right, err = strconv.ParseFloat(split[1], 64)
 
 		if err != nil {
 			panic(err)
@@ -36,15 +37,16 @@ func main() {
 		listRight = append(listRight, right)
 	}
 
-	sort.Ints(listLeft)
-	sort.Ints(listRight)
+	sort.Float64s(listLeft)
+	sort.Float64s(listRight)
 
-	sum := 0
-	for i, left := range listLeft {
-		right := listRight[i]
-		dist := math.Abs(float64(left - right))
-		sum += int(dist)
+	sum := .0
+	var i int
+	for i, left = range listLeft {
+		right = listRight[i]
+		dist := math.Abs(left - right)
+		sum += dist
 	}
 
-	println("Total dist: ", sum)
+	fmt.Printf("Sum: %.0f", sum)
 }
