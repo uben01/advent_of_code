@@ -19,18 +19,17 @@ func main() {
 	safeReports := 0
 
 	scanner := bufio.NewScanner(file)
-reports:
 	for scanner.Scan() {
 		levels := strings.Split(scanner.Text(), " ")
 		if skipNth(levels, nil) {
 			safeReports++
-			continue reports
+			continue
 		}
 
 		for i, _ := range levels {
 			if skipNth(levels, &i) {
 				safeReports++
-				continue reports
+				break
 			}
 		}
 	}
@@ -43,10 +42,10 @@ func skipNth(levels []string, skip *int) bool {
 	var prevLevel *int
 	var increasing bool
 
-	zerothSkipped := false
+	alreadySkipped := false
 	for i, level := range levels {
 		if skip != nil && i == *skip {
-			zerothSkipped = true
+			alreadySkipped = true
 			continue
 		}
 
@@ -60,7 +59,7 @@ func skipNth(levels []string, skip *int) bool {
 			continue
 		}
 
-		if (i == 1 && !zerothSkipped) || (i == 2 && zerothSkipped) {
+		if (i == 1 && !alreadySkipped) || (i == 2 && alreadySkipped) {
 			diff := math.Abs(float64(*prevLevel - level))
 			if diff == 0 || diff > 3 {
 				return false
