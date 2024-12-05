@@ -72,8 +72,10 @@ func main() {
 }
 
 func swapViolatingNums(rules []pair, split []string, swapFun func(int, int)) {
+	violating := false
 outer:
 	for {
+		violating = false
 		for i, first := range split {
 			for j, second := range split {
 				if i >= j {
@@ -82,11 +84,13 @@ outer:
 
 				if !checkAgainstRule(rules, first, second) {
 					swapFun(i, j)
-					continue outer
+					violating = true
 				}
 			}
 		}
-		break outer
+		if !violating {
+			break outer
+		}
 	}
 }
 
