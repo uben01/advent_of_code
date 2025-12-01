@@ -10,3 +10,5 @@ Cargo.lock
 # https://twitter.com/ericwastl/status/1465805354214830081
 *.txt
 *.svg
+
+**/.zig-cache/
